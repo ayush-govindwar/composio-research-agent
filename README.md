@@ -30,24 +30,36 @@ live-demo/app.py               Standalone FastAPI endpoint the report page
                                  research run on any app name.
 ```
 
+
+
 ## 🚀 Setup & Installation
 
 1. **Environment Setup**
-   ```bash
+  ```bash
    python -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
-   ```
-
+  ```
 2. **Configuration**
-   ```bash
+  ```bash
    cp .env.example .env
-   ```
+  ```
    Fill in your `GROQ_API_KEY` and `COMPOSIO_API_KEY` in the `.env` file.
-
-   > **Note:** The Python SDK automatically creates a scoped Exa session. Ensure your Composio API key has `Sessions -> Write` permission and that the Exa toolkit is enabled in your Composio project.
+  > **Note:** The Python SDK automatically creates a scoped Exa session. Ensure your Composio API key has `Sessions -> Write` permission and that the Exa toolkit is enabled in your Composio project.
 
 If `COMPOSIO_API_KEY` isn't set, the pipeline will still run end-to-end but return mocked responses (`is_mock: true`). This allows you to validate the pipeline plumbing (schema, checkpointing, report rendering) without consuming real API credits. Mock rows are excluded from statistics and visibly flagged in the final report.
+
+## 📸 Screenshots
+
+
+
+### Agent Pipeline
+
+![Agent Pipeline](screenshots/agent.png)
+
+### **Research Results** — [For full results, view the complete report]([https://drive.google.com/file/d/1o1Sw1_smNvUzDL8-q_GK6GhUudRPejDl/view?usp=sharing](https://drive.google.com/file/d/1o1Sw1_smNvUzDL8-q_GK6GhUudRPejDl/view?usp=sharing))
+
+![Research Results](screenshots/result.png)
 
 ## ⚙️ Running the Pipeline
 
@@ -72,20 +84,27 @@ python report/build_html.py
 open report/index.html
 ```
 
+
+
 ### Smoke Testing
 
 We recommend smoke-testing the pipeline on a small subset of apps before executing the full 100-app run:
+
 ```bash
 python research/research_agent.py --limit 5
 python research/verify_agent.py --limit 5
 ```
 
+
+
 ### Live Demo Endpoint
 
 To start the standalone FastAPI backend for real-time demo functionality:
+
 ```bash
 uvicorn live-demo.app:app --reload --port 8000
 ```
+
 For production deployment (Render/Railway/Fly), refer to the `live-demo/app.py` header for quick start commands. After deploying, update the `DEMO_API_URL` variable inside `<script>` in `report/template.html` and rebuild the report.
 
 ## 🧑‍💻 Human-in-the-Loop Methodology
@@ -95,6 +114,8 @@ To ensure high data integrity, this pipeline deliberately integrates human valid
 1. **Pattern Insights**: Actionable insights in the report (`report/template.html`) are curated by hand based on the raw statistical data (`data/stats.json`). This ensures genuine analytical depth rather than relying on LLM-regurgitated statistics.
 2. **Blind Audit**: The 20-app audit (`analysis/human_audit.py`) is conducted entirely manually. Auditors refer to live documentation and provide answers before seeing the agent's output, eliminating anchoring bias.
 3. **Disagreement Resolution**: Any discrepancies between Pass 1 and Pass 2 (that aren't part of the stratified audit) are spot-checked and resolved manually before finalizing `data/pass2.jsonl`.
+
+
 
 ## 📊 Accuracy Metrics
 
@@ -108,3 +129,4 @@ The accuracy metrics presented in this project represent measured real-world per
 - The human audit covers 100 data points (5 fields × 20 apps), providing a meaningful, stratified baseline without requiring thousands of manual checks.
 - Applications gated behind partnership or paid access are accurately flagged as such; this is an intended finding, not a pipeline failure.
 - Fully failed rows (`is_mock: true`) are excluded from general statistics and explicitly listed in the report banner rather than being silently discarded.
+
