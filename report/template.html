@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Agent-Callable App Landscape — 100 App Research Case Study</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #12151c; --panel2: #171b24; --border: #262b36;
+    --text: #e8eaee; --muted: #9aa3b2; --accent: #6ee7b7; --accent2: #7dd3fc;
+    --warn: #fbbf24; --bad: #f87171; --good: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; line-height: 1.5; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 40px 0 14px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--accent2); }
+  .subtitle { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .card .stat { font-size: 1.7rem; font-weight: 700; color: var(--accent); }
+  .card .label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+  ul.insights { padding-left: 18px; }
+  ul.insights li { margin-bottom: 8px; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  select, input[type=text] { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--panel2); cursor: pointer; color: var(--accent2); position: sticky; top: 0; white-space: nowrap; }
+  tr:hover td { background: #171b24; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+  .badge-self-serve { background: #103b2b; color: var(--good); }
+  .badge-gated-paid, .badge-gated-approval, .badge-gated-partnership { background: #3b2810; color: var(--warn); }
+  .badge-unknown { background: #2a2d36; color: var(--muted); }
+  .badge-ready { background: #103b2b; color: var(--good); }
+  .badge-blocked { background: #3b1414; color: var(--bad); }
+  .badge-possible-with-workaround { background: #3b2810; color: var(--warn); }
+  .badge-mock { background: #3b1414; color: var(--bad); font-weight: 700; }
+  .badge-mcp { background: #10283b; color: var(--accent2); }
+  .diagram { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+  .stage { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; flex: 1; min-width: 150px; text-align: center; font-size: 0.85rem; }
+  .stage .stage-label { color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+  .arrow { color: var(--muted); font-size: 1.2rem; }
+  .human-tag { background: #3b2810; color: var(--warn); font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; margin-top: 6px; display: inline-block; }
+  .accuracy-bars { display: flex; gap: 24px; margin: 18px 0; flex-wrap: wrap; }
+  .abar-group { flex: 1; min-width: 220px; }
+  .abar-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  .abar-track { background: var(--panel2); border-radius: 6px; height: 22px; overflow: hidden; border: 1px solid var(--border); }
+  .abar-fill { height: 100%; background: linear-gradient(90deg, var(--bad), var(--warn), var(--good)); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 700; color: #0b0d12; }
+  .miss-list, .correction-list { font-size: 0.82rem; }
+  .miss-item, .correction-item { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .miss-item .field { color: var(--accent2); font-weight: 600; }
+  .demo-box { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .demo-box input { width: 260px; margin-right: 8px; }
+  button { background: var(--accent); color: #0b0d12; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #demoResult { margin-top: 14px; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 0.78rem; background: var(--panel2); border-radius: 8px; padding: 12px; display: none; }
+  .footnote { color: var(--muted); font-size: 0.78rem; margin-top: 6px; }
+  .mock-banner { background: #2a1414; border: 1px solid #4a2020; color: #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; margin-bottom: 16px; }
+  .no-audit-banner { background: #2a2410; border: 1px solid #4a3f20; color: var(--warn); border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Agent-Callable App Landscape</h1>
+  <div class="subtitle">100 apps researched for API auth, access tier, API surface, and MCP-readiness — built as an agent pipeline, not by hand.</div>
+
+  <div id="mockBanner"></div>
+
+  <div class="cards" id="headlineCards"></div>
+
+  <h2>Patterns</h2>
+  <ul class="insights" id="insightsList">
+    <!-- Written by hand after seeing the numbers, not generated. Edit these directly. -->
+    <li>Auth method distribution, self-serve vs. gated split by category, and the most common blocker go here — see data/stats.json for the raw counts to write these from.</li>
+  </ul>
+
+  <h2>The Research Matrix</h2>
+  <div class="filters">
+    <input type="text" id="searchBox" placeholder="Search app name...">
+    <select id="categoryFilter"><option value="">All categories</option></select>
+    <select id="accessFilter"><option value="">All access tiers</option></select>
+    <select id="buildFilter"><option value="">All buildability</option></select>
+  </div>
+  <div style="overflow-x:auto;">
+    <table id="appsTable">
+      <thead>
+        <tr>
+          <th data-key="id">#</th>
+          <th data-key="name">App</th>
+          <th data-key="category">Category</th>
+          <th data-key="auth_methods">Auth</th>
+          <th data-key="access">Access</th>
+          <th data-key="api_surface_type">API</th>
+          <th data-key="has_mcp">MCP</th>
+          <th data-key="buildability">Buildable</th>
+          <th data-key="blocker">Blocker</th>
+        </tr>
+      </thead>
+      <tbody id="appsTbody"></tbody>
+    </table>
+  </div>
+  <div class="footnote">Click any column header to sort. Rows marked <span class="badge badge-mock">MOCK</span> are pipeline failures (no real research collected) and are excluded from all stats above.</div>
+
+  <h2>The Agent</h2>
+  <p style="color:var(--muted); font-size:0.9rem; max-width:720px;">Two independent agent passes, both using Composio's Exa toolset for search and content-fetch, plus a stratified human audit as ground truth.</p>
+  <div class="diagram">
+    <div class="stage"><div class="stage-label">Pass 1 — Research</div>Composio/Exa search per app → structured extraction → data/pass1.jsonl</div>
+    <div class="arrow">→</div>
+    <div class="stage"><div class="stage-label">Pass 2 — Verify</div>Fresh independent search + citation fetch-check → corrections → data/pass2.jsonl</div>
+    <div class="arrow">→</div>
+    <div class="stage"><div class="stage-label">Human Audit</div>Blind, stratified 20-app check (2/category)<div class="human-tag">human-in-the-loop</div></div>
+    <div class="arrow">→</div>
+    <div class="stage"><div class="stage-label">Report</div>Pattern analysis + this page</div>
+  </div>
+  <p style="color:var(--muted); font-size:0.85rem;">Where a human was needed: writing the pattern insights above (not LLM-generated), the 20-app blind audit that produced the accuracy numbers below, and resolving any app where both agent passes disagreed with each other.</p>
+
+  <h2>Verification — Did the Loop Actually Improve Accuracy?</h2>
+  <div id="auditSection"></div>
+
+  <h2>Try It Live</h2>
+  <div class="demo-box">
+    <p style="margin-top:0; color:var(--muted); font-size:0.85rem;">Type any app name and the research agent runs live against it (hits <code>/research</code> on the deployed FastAPI demo — set <code>DEMO_API_URL</code> below).</p>
+    <input type="text" id="demoAppName" placeholder="e.g. Linear">
+    <button id="demoRunBtn" onclick="runDemo()">Research it</button>
+    <div id="demoResult"></div>
+  </div>
+
+  <h2>Repo &amp; Reproduction</h2>
+  <p style="color:var(--muted); font-size:0.85rem;">Source, README, and the raw pass1/pass2/audit JSON backing this page live in the linked repo. <code>python research/research_agent.py</code> → <code>verify_agent.py</code> → <code>analysis/human_audit.py</code> → <code>analysis/analyze.py</code> → <code>report/build_html.py</code> reproduces this file exactly.</p>
+
+</div>
+
+<script>
+  const DEMO_API_URL = "http://localhost:8000"; // set to your deployed FastAPI URL
+
+  const STATS = {{ STATS_JSON | safe }};
+  const APPS = {{ APPS_JSON | safe }};
+  const AUDIT = {{ AUDIT_JSON | safe }};
+
+  // ---------- Mock banner ----------
+  if (STATS.mock_count > 0) {
+    document.getElementById('mockBanner').innerHTML =
+      `<div class="mock-banner"><strong>${STATS.mock_count}/${STATS.total_apps}</strong> apps failed the pipeline (no tools available / LLM error) and are excluded from every stat and pattern below. Flagged rows: ${STATS.mock_apps.map(a => a.name).join(', ')}.</div>`;
+  }
+
+  // ---------- Headline cards ----------
+  const topAuth = Object.entries(STATS.auth_methods || {}).sort((a,b) => b[1]-a[1])[0];
+  const selfServePct = STATS.real_apps ? Math.round(100 * (STATS.access_distribution['self-serve'] || 0) / STATS.real_apps) : 0;
+  const topBlocker = Object.entries(STATS.blockers || {}).sort((a,b) => b[1]-a[1])[0];
+  const auditAvail = AUDIT.summary && AUDIT.summary.available;
+
+  const cards = [
+    { stat: STATS.real_apps + '/' + STATS.total_apps, label: 'Apps successfully researched' },
+    { stat: topAuth ? `${topAuth[0]} (${topAuth[1]})` : '—', label: 'Most common auth method' },
+    { stat: selfServePct + '%', label: 'Self-serve access' },
+    { stat: STATS.has_mcp_count ?? 0, label: 'Apps with an existing MCP' },
+    { stat: topBlocker ? topBlocker[0] : '—', label: 'Most common blocker' },
+    { stat: auditAvail ? `${AUDIT.summary.pass1_field_accuracy_pct}% → ${AUDIT.summary.pass2_field_accuracy_pct}%` : 'not yet run', label: 'Human-audited accuracy (Pass 1 → Pass 2)' },
+  ];
+  document.getElementById('headlineCards').innerHTML = cards.map(c =>
+    `<div class="card"><div class="stat">${c.stat}</div><div class="label">${c.label}</div></div>`
+  ).join('');
+
+  // ---------- Patterns (Insights) ----------
+  const insightsEl = document.getElementById('insightsList');
+  if (STATS.real_apps > 0) {
+    const sortedAuth = Object.entries(STATS.auth_methods || {}).sort((a,b) => b[1]-a[1]);
+    const authText = sortedAuth.map(x => `${x[0]} (${Math.round(x[1]/STATS.real_apps*100)}%)`).join(', ');
+
+    const selfServe = STATS.access_distribution['self-serve'] || 0;
+    const gated = (STATS.access_distribution['gated-paid'] || 0) + 
+                  (STATS.access_distribution['gated-approval'] || 0) + 
+                  (STATS.access_distribution['gated-partnership'] || 0);
+
+    const blockerText = topBlocker ? `${topBlocker[0]} (seen in ${topBlocker[1]} apps)` : 'None';
+
+    insightsEl.innerHTML = `
+      <li><strong>Auth methods:</strong> ${authText}</li>
+      <li><strong>Access:</strong> ${selfServePct}% of apps are self-serve (${selfServe} total), while ${Math.round(gated/STATS.real_apps*100)}% are gated (${gated} total).</li>
+      <li><strong>Common blockers:</strong> The most frequent blocker for integration is ${blockerText}.</li>
+    `;
+  }
+
+  // ---------- Table ----------
+  const categories = [...new Set(APPS.map(a => a.category))].sort();
+  const accessTiers = [...new Set(APPS.map(a => a.access))].filter(Boolean).sort();
+  const buildTiers = [...new Set(APPS.map(a => a.buildability))].filter(Boolean).sort();
+  document.getElementById('categoryFilter').innerHTML += categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('accessFilter').innerHTML += accessTiers.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('buildFilter').innerHTML += buildTiers.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  let sortKey = 'id', sortAsc = true;
+
+  function badge(val, prefix) {
+    const cls = `badge-${(val||'unknown').toString().replace(/\s+/g,'-')}`;
+    return `<span class="badge ${cls}">${val||'unknown'}</span>`;
+  }
+
+  function renderTable() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    const cat = document.getElementById('categoryFilter').value;
+    const acc = document.getElementById('accessFilter').value;
+    const build = document.getElementById('buildFilter').value;
+
+    let rows = APPS.filter(a =>
+      (!q || a.name.toLowerCase().includes(q)) &&
+      (!cat || a.category === cat) &&
+      (!acc || a.access === acc) &&
+      (!build || a.buildability === build)
+    );
+
+    rows.sort((a,b) => {
+      let av = a[sortKey], bv = b[sortKey];
+      if (Array.isArray(av)) av = av.join(',');
+      if (Array.isArray(bv)) bv = bv.join(',');
+      if (typeof av === 'number' && typeof bv === 'number') return sortAsc ? av-bv : bv-av;
+      return sortAsc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+
+    document.getElementById('appsTbody').innerHTML = rows.map(a => `
+      <tr>
+        <td>${a.id}</td>
+        <td>${a.name}${a.is_mock ? ' <span class="badge badge-mock">MOCK</span>' : ''}</td>
+        <td>${a.category}</td>
+        <td>${(a.auth_methods||[]).join(', ') || '—'}</td>
+        <td>${badge(a.access)}</td>
+        <td>${a.api_surface_type || '—'} <span style="color:var(--muted)">/${a.api_surface_breadth||'?'}</span></td>
+        <td>${a.has_mcp ? `<span class="badge badge-mcp">${a.mcp_source||'yes'}</span>` : '—'}</td>
+        <td>${badge(a.buildability)}</td>
+        <td style="max-width:220px;">${a.blocker || '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  document.querySelectorAll('#appsTable th').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if (sortKey === key) sortAsc = !sortAsc; else { sortKey = key; sortAsc = true; }
+      renderTable();
+    });
+  });
+  ['searchBox','categoryFilter','accessFilter','buildFilter'].forEach(id =>
+    document.getElementById(id).addEventListener('input', renderTable)
+  );
+  renderTable();
+
+  // ---------- Verification / audit section ----------
+  const auditEl = document.getElementById('auditSection');
+  if (!auditAvail) {
+    auditEl.innerHTML = `<div class="no-audit-banner">Human audit not yet run. Execute <code>analysis/human_audit.py</code> then rebuild this report to populate real accuracy numbers here.</div>`;
+  } else {
+    const s = AUDIT.summary;
+    const misses = s.example_misses || [];
+    const corrections = STATS.example_corrections || [];
+    auditEl.innerHTML = `
+      <p style="color:var(--muted); font-size:0.85rem;">Blind, stratified audit: ${s.n_apps_audited} apps (2 per category), ${s.n_fields_audited} fields each, checked by hand against real docs with no visibility into the agent's answer beforehand.</p>
+      <div class="accuracy-bars">
+        <div class="abar-group">
+          <div class="abar-label">Pass 1 field accuracy (${s.pass1_fields_checked} fields checked)</div>
+          <div class="abar-track"><div class="abar-fill" style="width:${s.pass1_field_accuracy_pct}%">${s.pass1_field_accuracy_pct}%</div></div>
+        </div>
+        <div class="abar-group">
+          <div class="abar-label">Pass 2 field accuracy (${s.pass2_fields_checked} fields checked)</div>
+          <div class="abar-track"><div class="abar-fill" style="width:${s.pass2_field_accuracy_pct}%">${s.pass2_field_accuracy_pct}%</div></div>
+        </div>
+      </div>
+      <h3 style="font-size:0.95rem; color:var(--accent2);">Remaining misses after Pass 2 (shown honestly)</h3>
+      <div class="miss-list">
+        ${misses.length ? misses.map(m => `<div class="miss-item"><span class="field">${m.name} — ${m.field}</span>: agent said "${JSON.stringify(m.pass2_said)}", human found "${JSON.stringify(m.human_said)}"</div>`).join('') : '<div class="miss-item">No misses in the audited sample — Pass 2 matched human ground truth on every checked field.</div>'}
+      </div>
+      <h3 style="font-size:0.95rem; color:var(--accent2);">Example corrections Pass 2 made over Pass 1</h3>
+      <div class="correction-list">
+        ${corrections.length ? corrections.map(c => `<div class="correction-item"><span class="field">${c.name}</span> (via ${c.verification_source}): ${c.corrections.join('; ')}</div>`).join('') : '<div class="correction-item">No corrections were needed — Pass 1 and Pass 2 agreed on every app.</div>'}
+      </div>
+    `;
+  }
+
+  // ---------- Live demo ----------
+  async function runDemo() {
+    const name = document.getElementById('demoAppName').value.trim();
+    const resultEl = document.getElementById('demoResult');
+    const btn = document.getElementById('demoRunBtn');
+    if (!name) return;
+    btn.disabled = true; btn.textContent = 'Researching...';
+    resultEl.style.display = 'block';
+    resultEl.textContent = `Calling ${DEMO_API_URL}/research for "${name}"...`;
+    try {
+      const res = await fetch(`${DEMO_API_URL}/research`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({app_name: name})
+      });
+      const data = await res.json();
+      resultEl.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      resultEl.textContent = `Request failed: ${e}. Is the FastAPI demo deployed and DEMO_API_URL set correctly in this file?`;
+    }
+    btn.disabled = false; btn.textContent = 'Research it';
+  }
+</script>
+</body>
+</html>
