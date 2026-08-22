@@ -61,6 +61,10 @@ If `COMPOSIO_API_KEY` isn't set, the pipeline will still run end-to-end but retu
 
 ![Research Results](screenshots/result.png)
 
+## Human Audit
+
+![Human Audit](screenshots/human.png)
+
 ## ⚙️ Running the Pipeline
 
 You can run the pipeline stages sequentially as follows:
